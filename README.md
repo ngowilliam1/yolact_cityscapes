@@ -16,6 +16,8 @@ cd yolact_cityscapes
 # If you need to install conda
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
+
+# Create env with requirements
 conda env create -f environment.yml
 
 # activate the conda environment
