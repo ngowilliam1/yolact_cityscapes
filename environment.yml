@@ -5,7 +5,7 @@
 # `apt install nvidia-driver-440` (change the 440 for whatever version you need/have).
 #
 name: yolact-env-city
-#prefix: /your/custom/path/envs/yolact-env
+#prefix: /your/custom/path/envs/yolact-env-city
 channels:
   - conda-forge
   - pytorch

@@ -21,5 +21,5 @@ bash Miniconda3-latest-Linux-x86_64.sh
 conda env create -f environment.yml
 
 # activate the conda environment
-source activate yolact-env
+source activate yolact-env-city
 ```
