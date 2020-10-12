@@ -25,6 +25,13 @@ source activate yolact-env-city
 
 ```
 
-### To obtain dataset
+### To Obtain Dataset
 Place in ./data/ and extract the following: 
 [Cityscapes Annotations and Images](https://drive.google.com/file/d/1YvRTX4aZCcuQYenPFbRFRkclpa7K2F3R/view?usp=sharing)
+
+### To Train Using Cityscapes
+```bash
+# Trains using the resnet50 with batch size of 8
+python train.py --config=yolact_resnet50_cityscapes_config
+
+```
