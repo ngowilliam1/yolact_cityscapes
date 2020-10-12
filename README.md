@@ -22,4 +22,10 @@ conda env create -f environment.yml
 
 # activate the conda environment
 source activate yolact-env-city
+
 ```
+
+### To obtain dataset
+Download and extract the following and place in ./data/ 
+[Cityscapes Annotations and Images](https://drive.google.com/file/d/1YvRTX4aZCcuQYenPFbRFRkclpa7K2F3R/view?usp=sharing)
+
