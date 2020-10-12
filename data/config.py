@@ -172,7 +172,40 @@ pascal_sbd_dataset = dataset_base.copy({
     'class_names': PASCAL_CLASSES,
 })
 
+CITYSCAPES_CLASSES = (
+    'person',
+    'rider',
+    'car',
+    'truck',
+    'bus',
+    'train',
+    'motorcycle',
+    'bicycle',
+)
 
+
+cityscapes_dataset = dataset_base.copy({
+    'name': 'Cityscapes',
+
+    # Training images and annotations
+    'train_images': './data/cityscapes/images/',
+    'train_info':   './data/cityscapes/annotations/instancesonly_filtered_gtFine_train.json',
+
+    # Validation images and annotations.
+    'valid_images': './data/cityscapes/images/',
+    'valid_info':   './data/cityscapes/annotations/instancesonly_filtered_gtFine_val.json',
+
+    # Whether or not to load GT. If this is False, eval.py quantitative evaluation won't work.
+    'has_gt': True,
+
+    # A list of names for each of you classes.
+    'class_names': CITYSCAPES_CLASSES,
+
+    # COCO class ids aren't sequential, so this is a bandage fix. If your ids aren't sequential,
+    # provide a map from category_id -> index in class_names + 1 (the +1 is there because it's 1-indexed).
+    # If not specified, this just assumes category ids start at 1 and increase sequentially.
+    'label_map': None
+})
 
 
 
