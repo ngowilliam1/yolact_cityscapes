@@ -4,7 +4,7 @@
 # TODO: you must additionally install nVidia drivers, eg. on Ubuntu linux 
 # `apt install nvidia-driver-440` (change the 440 for whatever version you need/have).
 #
-name: yolact-env
+name: yolact-env-city
 #prefix: /your/custom/path/envs/yolact-env
 channels:
   - conda-forge
@@ -24,6 +24,7 @@ dependencies:
   - scikit-learn
   - pytorch::cuda100
   - matplotlib
+  - tensorboard
   - git # to download COCO dataset
   - curl # to download COCO dataset
   - unzip # to download COCO dataset
