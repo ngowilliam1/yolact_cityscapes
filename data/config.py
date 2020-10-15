@@ -803,7 +803,7 @@ yolact_resnet50_pascal_config = yolact_resnet50_config.copy({
 
 # TODO: ensure correctness of parameters past num_classes
 yolact_resnet50_cityscapes_config = yolact_resnet50_config.copy({
-    'name': yolact_resnet50_cityscapes, 
+    'name': 'yolact_resnet50_cityscapes', 
     
     # Dataset stuff
     'dataset': cityscapes_dataset,
