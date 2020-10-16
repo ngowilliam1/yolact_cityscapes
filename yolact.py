@@ -487,7 +487,14 @@ class Yolact(nn.Module):
             if key.startswith('fpn.downsample_layers.'):
                 if cfg.fpn is not None and int(key.split('.')[2]) >= cfg.fpn.num_downsample:
                     del state_dict[key]
-        self.load_state_dict(state_dict)
+        # Added to provide fine-tuning
+        try:
+            self.load_state_dict(state_dict)
+        except RuntimeError as e:
+            if cfg.transfer_learning_allowed:
+                print('Ignoring "' + str(e) + '"')
+            else:
+                raise RuntimeError('Fine Tuning is not allowed!')
 
     def init_weights(self, backbone_path):
         """ Initialize weights for training. """
@@ -624,8 +631,10 @@ class Yolact(nn.Module):
                 # A hack for the way dataparallel works
                 if cfg.share_prediction_module and pred_layer is not self.prediction_layers[0]:
                     pred_layer.parent = [self.prediction_layers[0]]
-
-                p = pred_layer(pred_x)
+                if cfg.only_last_layer:
+                    p = pred_layer(pred_x.detach())
+                else:
+                    p = pred_layer(pred_x)
                 
                 for k, v in p.items():
                     pred_outs[k].append(v)

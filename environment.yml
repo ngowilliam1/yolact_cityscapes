@@ -25,6 +25,7 @@ dependencies:
   - pytorch::cuda100
   - matplotlib
   - tensorboard
+  - ipdb
   - git # to download COCO dataset
   - curl # to download COCO dataset
   - unzip # to download COCO dataset

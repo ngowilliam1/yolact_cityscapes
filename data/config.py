@@ -678,6 +678,10 @@ coco_base_config = Config({
     'rescore_mask': False,
     'rescore_bbox': False,
     'maskious_to_train': -1,
+    
+    # Disable transfer learning by default
+    'transfer_learning_allowed': False,
+    'only_last_layer' = False,
 })
 
 
@@ -876,3 +880,6 @@ def set_dataset(dataset_name:str):
     cfg.dataset = eval(dataset_name)
     
     
+def set_fine_tune(transfer_learning_allowed: bool, only_last_layer:bool):
+    cfg.transfer_learning_allowed = transfer_learning_allowed
+    cfg.only_last_layer = only_last_layer
