@@ -487,7 +487,12 @@ class Yolact(nn.Module):
             if key.startswith('fpn.downsample_layers.'):
                 if cfg.fpn is not None and int(key.split('.')[2]) >= cfg.fpn.num_downsample:
                     del state_dict[key]
+
         # Added to provide fine-tuning
+        # When there are size mismatches between tensors, Pytorch will spit out an error message but also keep on loading the rest of the tensors anyway
+        # So here we just attempt to load a checkpoint with the wrong number of classes, eat the errors the Pytorch complains about
+        # then start training from iteration 0 with just those couple of tensors being untrained
+        # You should see only the C (class) and S (semantic segmentation) losses reset.
         try:
             self.load_state_dict(state_dict)
         except RuntimeError as e:
@@ -631,6 +636,8 @@ class Yolact(nn.Module):
                 # A hack for the way dataparallel works
                 if cfg.share_prediction_module and pred_layer is not self.prediction_layers[0]:
                     pred_layer.parent = [self.prediction_layers[0]]
+                
+                # Only last layer is trained if this is True
                 if cfg.only_last_layer:
                     p = pred_layer(pred_x.detach())
                 else:

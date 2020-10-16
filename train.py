@@ -80,8 +80,7 @@ parser.add_argument('--no_autoscale', dest='autoscale', action='store_false',
                     help='YOLACT will automatically scale the lr and the number of iterations depending on the batch size. Set this if you want to disable that.')
 parser.add_argument('--transfer_learning_allowed', default=False, type=bool,
                     help='Allow fine tuning of network, will throw exception if set to false and incorrectly loading weights for data')
-parser.add_argument('--only_last_layer', default=False, type=bool,
-                    help='Only train the last classification layer.')
+
 parser.set_defaults(keep_latest=False, log=True, log_gpu=False, interrupt=True, autoscale=True)
 args = parser.parse_args()
 
@@ -91,7 +90,7 @@ if args.config is not None:
 if args.dataset is not None:
     set_dataset(args.dataset)
 
-set_fine_tune(args.transfer_learning_allowed, args.only_last_layer)
+set_fine_tune(args.transfer_learning_allowed)
 
 if args.autoscale and args.batch_size != 8:
     factor = args.batch_size / 8

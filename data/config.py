@@ -678,10 +678,10 @@ coco_base_config = Config({
     'rescore_mask': False,
     'rescore_bbox': False,
     'maskious_to_train': -1,
-    
+
     # Disable transfer learning by default
     'transfer_learning_allowed': False,
-    'only_last_layer' = False,
+    'only_last_layer': False,
 })
 
 
@@ -776,7 +776,7 @@ yolact_darknet53_config = yolact_base_config.copy({
 
 yolact_resnet50_config = yolact_base_config.copy({
     'name': 'yolact_resnet50',
-
+    
     'backbone': resnet50_backbone.copy({
         'selected_layers': list(range(1, 4)),
         
@@ -806,14 +806,15 @@ yolact_resnet50_pascal_config = yolact_resnet50_config.copy({
 })
 
 # TODO: ensure correctness of parameters past num_classes
+### Mimicked pascal
 yolact_resnet50_cityscapes_config = yolact_resnet50_config.copy({
-    'name': 'yolact_resnet50_cityscapes', 
-    
+    'name': 'yolact_resnet50_cityscapes_fully_fine_tuned', 
+
     # Dataset stuff
     'dataset': cityscapes_dataset,
     'num_classes': len(cityscapes_dataset.class_names) + 1,
 
-    'max_iter': 120000,
+    'max_iter': 40000,
     'lr_steps': (60000, 100000),
     
     'backbone': yolact_resnet50_config.backbone.copy({
@@ -821,6 +822,13 @@ yolact_resnet50_cityscapes_config = yolact_resnet50_config.copy({
         'use_square_anchors': False,
     })
 })
+
+# TODO: ensure correctness of parameters past num_classes
+yolact_resnet50_cityscapes_config_last_layer = yolact_resnet50_cityscapes_config.copy({
+    'name': 'yolact_resnet50_cityscapes_last_layer', 
+    'only_last_layer': True,
+})
+
 
 # ----------------------- YOLACT++ CONFIGS ----------------------- #
 
@@ -860,6 +868,35 @@ yolact_plus_resnet50_config = yolact_plus_base_config.copy({
     }),
 })
 
+# TODO: ensure correctness of parameters past num_classes
+yolact_plus_resnet50_cityscapes_config = yolact_plus_base_config.copy({
+    'name': 'yolact_plus_resnet50_cityscapes', 
+    
+
+    # Dataset stuff
+    'dataset': cityscapes_dataset,
+    'num_classes': len(cityscapes_dataset.class_names) + 1,
+
+    'max_iter': 40000,
+    'lr_steps': (60000, 100000),
+    
+    'backbone': resnet50_dcnv2_backbone.copy({
+        'selected_layers': list(range(1, 4)),
+        
+        'pred_aspect_ratios': [ [[1, 1/2, 2]] ]*5,
+        'pred_scales': [[i * 2 ** (j / 3.0) for j in range(3)] for i in [24, 48, 96, 192, 384]],
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': False,
+    }),
+
+})
+# TODO: ensure correctness of parameters past num_classes
+yolact_plus_resnet50_cityscapes_config_last_layer = yolact_plus_resnet50_cityscapes_config.copy({
+    'name': 'yolact_plus_resnet50_cityscapes_last_layer', 
+    'only_last_layer': True,
+})
+
 
 # Default config
 cfg = yolact_base_config.copy()
@@ -880,6 +917,6 @@ def set_dataset(dataset_name:str):
     cfg.dataset = eval(dataset_name)
     
     
-def set_fine_tune(transfer_learning_allowed: bool, only_last_layer:bool):
+def set_fine_tune(transfer_learning_allowed: bool):
     cfg.transfer_learning_allowed = transfer_learning_allowed
-    cfg.only_last_layer = only_last_layer
+    
