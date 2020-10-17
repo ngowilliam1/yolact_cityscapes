@@ -747,11 +747,11 @@ yolact_cityscapes_config = yolact_base_config.copy({
     # Dataset stuff
     'dataset': cityscapes_dataset,
     'num_classes': len(cityscapes_dataset.class_names) + 1,
-    # 37500 iter ~= 100 epochs
+    # 22500 iter ~= 60 epochs
     # 3000/8 = 375
-    # Lets save at every 20 epochs ie: save at each 375*20=7500 iter
-    'max_iter': 37500,
-    'lr_steps': (.35 * 37500, .75 * 37500, .88 * 37500, .93 * 37500),
+    # Lets save at every 10 epochs ie: save at each 375*10=3750 iter
+    'max_iter': 22500,
+    'lr_steps': (.35 * 22500, .75 * 22500, .88 * 22500, .93 * 22500),
 })
 
 # TODO: ensure correctness of parameters past num_classes
