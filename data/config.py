@@ -207,6 +207,28 @@ cityscapes_dataset = dataset_base.copy({
     'label_map': None
 })
 
+cityscapes_with_coco_dataset = dataset_base.copy({
+    'name': 'Cityscapes',
+
+    # Training images and annotations
+    'train_images': './data/cityscapes/images/',
+    'train_info':   './data/cityscapes/annotations/instancesonly_filtered_gtFine_train.json',
+
+    # Validation images and annotations.
+    'valid_images': './data/cityscapes/images/',
+    'valid_info':   './data/cityscapes/annotations/instancesonly_filtered_gtFine_val.json',
+
+    # Whether or not to load GT. If this is False, eval.py quantitative evaluation won't work.
+    'has_gt': True,
+
+    # A list of names for each of you classes.
+    'class_names': COCO_CLASSES,
+
+    # COCO class ids aren't sequential, so this is a bandage fix. If your ids aren't sequential,
+    # provide a map from category_id -> index in class_names + 1 (the +1 is there because it's 1-indexed).
+    # If not specified, this just assumes category ids start at 1 and increase sequentially.
+    'label_map': None
+})
 
 
 # ----------------------- TRANSFORMS ----------------------- #
@@ -803,11 +825,38 @@ yolact_resnet50_pascal_config = yolact_resnet50_config.copy({
 
 # TODO: ensure correctness of parameters past num_classes
 yolact_resnet50_cityscapes_config = yolact_resnet50_config.copy({
-    'name': yolact_resnet50_cityscapes, 
+    'name': "yolact_resnet50_cityscapes", 
     
     # Dataset stuff
-    'dataset': cityscapes_dataset,
-    'num_classes': len(cityscapes_dataset.class_names) + 1,
+    'dataset': cityscapes_with_coco_dataset,
+    'num_classes': len(cityscapes_with_coco_dataset.class_names) + 1,
+
+    'max_iter': 120000,
+    'lr_steps': (60000, 100000),
+    
+    'backbone': yolact_resnet50_config.backbone.copy({
+        'pred_scales': [[32], [64], [128], [256], [512]],
+        'use_square_anchors': False,
+    })
+})
+
+yolact_resnet50_cityscapes_with_coco_config = yolact_resnet50_config.copy({
+    'name': "yolact_resnet50_cityscapes", 
+    
+    # Dataset stuff
+    'dataset': cityscapes_with_coco_dataset,
+    'num_classes': len(cityscapes_with_coco_dataset.class_names) + 1,
+
+    'output_classes_map': {
+        1: 0, 
+        2: 1,
+        3: 2,
+        4: 3,
+        6: 4, 
+        7: 5,
+        8: 6,
+        9: 7,
+    },
 
     'max_iter': 120000,
     'lr_steps': (60000, 100000),
@@ -854,6 +903,28 @@ yolact_plus_resnet50_config = yolact_plus_base_config.copy({
         'preapply_sqrt': False,
         'use_square_anchors': False,
     }),
+})
+
+yolact_plus_resnet50_cityscapes_config = yolact_base_config.copy({
+    'name': 'yolact_plus_resnet50_cityscapes',
+
+    'backbone': resnet50_dcnv2_backbone.copy({
+        'selected_layers': list(range(1, 4)),
+        
+        'pred_aspect_ratios': [ [[1, 1/2, 2]] ]*5,
+        'pred_scales': [[i * 2 ** (j / 3.0) for j in range(3)] for i in [24, 48, 96, 192, 384]],
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': False,
+    }),
+
+    'use_maskiou': True,
+    'maskiou_net': [(8, 3, {'stride': 2}), (16, 3, {'stride': 2}), (32, 3, {'stride': 2}), (64, 3, {'stride': 2}), (128, 3, {'stride': 2})],
+    'maskiou_alpha': 25,
+    'rescore_bbox': False,
+    'rescore_mask': True,
+
+    'discard_mask_area': 5*5,
 })
 
 

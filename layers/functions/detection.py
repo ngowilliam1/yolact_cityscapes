@@ -105,6 +105,25 @@ class Detect(object):
             if self.use_cross_class_nms:
                 print('Warning: Cross Class Traditional NMS is not implemented.')
 
+        # Do an output mapping for running COCO model on another dataset
+        # and delete any classes that are not in the new dataset.
+        if hasattr(cfg, 'output_classes_map'):
+    
+            num_classes = classes.size()[0]
+            keep = torch.ones(num_classes, dtype=torch.bool)
+            for i in range(num_classes):
+                if int(classes[i]) not in cfg.output_classes_map.keys():
+                    keep[i] = False
+                else:
+                    # Perform class mapping
+                    classes[i] = cfg.output_classes_map[int(classes[i])]
+
+            # Delete classes
+            classes = classes[keep]
+            boxes = boxes[keep]
+            masks = masks[keep]
+            scores = scores[keep]
+
         return {'box': boxes, 'mask': masks, 'class': classes, 'score': scores}
 
 
