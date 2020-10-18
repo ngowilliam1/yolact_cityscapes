@@ -682,6 +682,10 @@ coco_base_config = Config({
     # Disable transfer learning by default
     'transfer_learning_allowed': False,
     'only_last_layer': False,
+
+    # Disabled training of layers
+    'disabled_layers_train': [],
+
 })
 
 
@@ -765,6 +769,15 @@ yolact_cityscapes_config_last_layer = yolact_cityscapes_config.copy({
     'lr_steps': (.35 * 7500, .75 * 7500, .88 * 7500, .93 * 7500),
 })
 
+yolact_cityscapes_config_no_backbone_training = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_no_backbone_training',
+    'disabled_layers_train': ['backbone'],
+})
+
+yolact_cityscapes_config_no_protonet_training = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_no_backbone_training',
+    'disabled_layers_train': ['proto_net'],
+})
 
 yolact_im400_config = yolact_base_config.copy({
     'name': 'yolact_im400',

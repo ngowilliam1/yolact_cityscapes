@@ -190,6 +190,13 @@ def train():
     # Parallel wraps the underlying module, but when saving and loading we don't want that
     yolact_net = Yolact()
     net = yolact_net
+    # Disables training of certain layers based on config
+    if cfg.disabled_layers_train:
+        for name, layer in net.named_modules():
+            if name in cfg.disabled_layers_train:
+                for param in layer.parameters():
+                    param.requires_grad = False
+    apple = 'alright'
     net.train()
 
     if args.log:
