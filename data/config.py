@@ -759,7 +759,7 @@ yolact_cityscapes_config = yolact_base_config.copy({
 })
 
 yolact_cityscapes_config_no_backbone_fpn = yolact_cityscapes_config.copy({
-    'name': 'yolact_cityscapes_config_fully_fine_tuned_no_backbone_fpn', 
+    'name': 'yolact_cityscapes_full_head_tuned', 
 
     'disabled_layers_train': ['backbone','fpn'],
     # 45000 iter ~= 120 epochs
