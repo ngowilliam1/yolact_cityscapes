@@ -873,6 +873,20 @@ yolact_resnet50_cityscapes_config_last_layer = yolact_resnet50_cityscapes_config
     'lr_steps': (.35 * 7500, .75 * 7500, .88 * 7500, .93 * 7500),
 })
 
+yolact_resnet101_im700_cityscapes_config = yolact_im700_config.copy({
+    'name': 'yolact_resnet101_im700_cityscapes_full_head_tuned', 
+
+    # Dataset stuff
+    'dataset': cityscapes_dataset,
+    'num_classes': len(cityscapes_dataset.class_names) + 1,
+
+    'disabled_layers_train': ['backbone', 'fpn'],
+
+    # 37500 iter ~= 100 epochs
+    # Lets save at every 20 epochs
+    'max_iter': 37500,
+    'lr_steps': (.35 * 37500, .75 * 37500, .88 * 37500, .93 * 37500),
+})
 
 
 # ----------------------- YOLACT++ CONFIGS ----------------------- #
