@@ -867,6 +867,28 @@ yolact_resnet50_cityscapes_with_coco_config = yolact_resnet50_config.copy({
     })
 })
 
+yolact_resnet101_im700_cityscapes_with_coco_config = yolact_im700_config.copy({
+    'name': "yolact_resnet50_cityscapes", 
+    
+    # Dataset stuff
+    'dataset': cityscapes_with_coco_dataset,
+    'num_classes': len(cityscapes_with_coco_dataset.class_names) + 1,
+
+    'output_classes_map': {
+        1: 0, 
+        2: 1,
+        3: 2,
+        4: 3,
+        6: 4, 
+        7: 5,
+        8: 6,
+        9: 7,
+    },
+
+    'max_iter': 120000,
+    'lr_steps': (60000, 100000),
+})
+
 # ----------------------- YOLACT++ CONFIGS ----------------------- #
 
 yolact_plus_base_config = yolact_base_config.copy({
