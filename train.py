@@ -196,7 +196,6 @@ def train():
             if name in cfg.disabled_layers_train:
                 for param in layer.parameters():
                     param.requires_grad = False
-    apple = 'alright'
     net.train()
 
     if args.log:

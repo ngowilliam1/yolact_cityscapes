@@ -9,13 +9,13 @@
 ### Installation
 
 ```bash
-# Clone this repository
-git clone https://github.com/ngowilliam1/yolact_cityscapes.git
-cd yolact_cityscapes
-
 # If you need to install conda
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
+
+# Clone this repository
+git clone https://github.com/ngowilliam1/yolact_cityscapes.git
+cd yolact_cityscapes
 
 # Create env with requirements
 conda env create -f environment.yml
@@ -26,8 +26,13 @@ source activate yolact-env-city
 ```
 
 ### To Obtain Dataset
-Place in ./data/ and extract the following: 
-[Cityscapes Annotations and Images](https://drive.google.com/file/d/1YvRTX4aZCcuQYenPFbRFRkclpa7K2F3R/view?usp=sharing)
+```bash
+cd data
+# Download Cityscapes annotations and images:
+gdown https://drive.google.com/uc?id=1YvRTX4aZCcuQYenPFbRFRkclpa7K2F3R
+# Extract
+unzip -q cityscapes.zip
+```
 
 ### To Train Using Cityscapes
 ```bash

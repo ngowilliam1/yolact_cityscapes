@@ -26,6 +26,7 @@ dependencies:
   - matplotlib
   - tensorboard
   - ipdb
+  - gdown
   - git # to download COCO dataset
   - curl # to download COCO dataset
   - unzip # to download COCO dataset

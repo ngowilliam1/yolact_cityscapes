@@ -758,6 +758,7 @@ yolact_cityscapes_config = yolact_base_config.copy({
     'lr_steps': (.35 * 22500, .75 * 22500, .88 * 22500, .93 * 22500),
 })
 
+
 # TODO: ensure correctness of parameters past num_classes
 yolact_cityscapes_config_last_layer = yolact_cityscapes_config.copy({
     'name': 'yolact_cityscapes_config_last_layer', 
