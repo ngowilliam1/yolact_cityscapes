@@ -758,6 +758,17 @@ yolact_cityscapes_config = yolact_base_config.copy({
     'lr_steps': (.35 * 22500, .75 * 22500, .88 * 22500, .93 * 22500),
 })
 
+yolact_cityscapes_config_no_backbone_fpn = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_fully_fine_tuned_no_backbone_fpn', 
+
+    'disabled_layers_train': ['backbone','fpn'],
+    # 45000 iter ~= 120 epochs
+    # 3000/8 = 375
+    # Lets save at every 10 epochs ie: save at each 375*10=3750 iter
+    'max_iter': 45000,
+    'lr_steps': (.35 * 45000, .75 * 45000, .88 * 45000, .93 * 45000),
+})
+
 
 # TODO: ensure correctness of parameters past num_classes
 yolact_cityscapes_config_last_layer = yolact_cityscapes_config.copy({
