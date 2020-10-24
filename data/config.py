@@ -183,6 +183,16 @@ CITYSCAPES_CLASSES = (
     'bicycle',
 )
 
+CITYSCAPES_LABEL_MAP = {
+    0: 0,
+    1: 2,
+    2: 7,
+    3: 1,
+    4: 4,
+    5: 5,
+    6: 6,
+    7: 3,
+}
 
 cityscapes_dataset = dataset_base.copy({
     'name': 'Cityscapes',
@@ -204,9 +214,8 @@ cityscapes_dataset = dataset_base.copy({
     # COCO class ids aren't sequential, so this is a bandage fix. If your ids aren't sequential,
     # provide a map from category_id -> index in class_names + 1 (the +1 is there because it's 1-indexed).
     # If not specified, this just assumes category ids start at 1 and increase sequentially.
-    'label_map': None
-})
-
+    'label_map': CITYSCAPES_LABEL_MAP
+}) 
 
 
 # ----------------------- TRANSFORMS ----------------------- #
@@ -906,6 +915,24 @@ yolact_resnet101_im700_cityscapes_config = yolact_im700_config.copy({
     'lr_steps': (.35 * 37500, .75 * 37500, .88 * 37500, .93 * 37500),
 })
 
+
+yolact_resnet101_im700_aspect_ratio_cityscapes_config = yolact_im700_config.copy({
+    'name': 'yolact_resnet101_im700_full_head_presever_aspect_ratio', 
+
+    # Dataset stuff
+    'dataset': cityscapes_dataset,
+    'num_classes': len(cityscapes_dataset.class_names) + 1,
+
+    'disabled_layers_train': ['backbone', 'fpn'],
+    'preserve_aspect_ratio': True,
+
+    'output_classes_map': CITYSCAPES_LABEL_MAP,
+
+    # 37500 iter ~= 100 epochs
+    # Lets save at every 20 epochs
+    'max_iter': 15000,
+    'lr_steps': (.35 * 37500, .75 * 37500, .88 * 37500, .93 * 37500),
+})
 
 # ----------------------- YOLACT++ CONFIGS ----------------------- #
 
