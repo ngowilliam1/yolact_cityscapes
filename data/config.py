@@ -758,6 +758,12 @@ yolact_cityscapes_config = yolact_base_config.copy({
     'lr_steps': (.35 * 22500, .75 * 22500, .88 * 22500, .93 * 22500),
 })
 
+yolact_cityscapes_config_preserve_aspect_ratio = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_fully_fine_tuned_preserve_aspect_ratio',
+    'preserve_aspect_ratio': True,
+})
+
+
 yolact_cityscapes_config_no_backbone_fpn = yolact_cityscapes_config.copy({
     # USE batch size of 6!
     'name': 'yolact_cityscapes_full_head_tuned', 
