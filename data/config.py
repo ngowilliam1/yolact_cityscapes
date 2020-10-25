@@ -189,9 +189,9 @@ CITYSCAPES_LABEL_MAP = {
     2: 7,
     3: 1,
     4: 4,
-    5: 5,
+    5: 3,
     6: 6,
-    7: 3,
+    7: 5,
 }
 
 cityscapes_dataset = dataset_base.copy({
@@ -214,7 +214,7 @@ cityscapes_dataset = dataset_base.copy({
     # COCO class ids aren't sequential, so this is a bandage fix. If your ids aren't sequential,
     # provide a map from category_id -> index in class_names + 1 (the +1 is there because it's 1-indexed).
     # If not specified, this just assumes category ids start at 1 and increase sequentially.
-    'label_map': CITYSCAPES_LABEL_MAP
+    'label_map': None
 }) 
 
 
@@ -1012,4 +1012,7 @@ def set_dataset(dataset_name:str):
     
 def set_fine_tune(transfer_learning_allowed: bool):
     cfg.transfer_learning_allowed = transfer_learning_allowed
+
+def set_use_new_mappings():
+    cfg.dataset.label_map = CITYSCAPES_LABEL_MAP
     
