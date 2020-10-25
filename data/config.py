@@ -183,6 +183,17 @@ CITYSCAPES_CLASSES = (
     'bicycle',
 )
 
+# CITYSCAPES_LABEL_MAP = {
+#     0: 0,
+#     1: 2,
+#     2: 7,
+#     3: 1,
+#     4: 4,
+#     5: 5,
+#     6: 6,
+#     7: 3,
+# }
+
 CITYSCAPES_LABEL_MAP = {
     0: 0,
     1: 2,
@@ -216,6 +227,12 @@ cityscapes_dataset = dataset_base.copy({
     # If not specified, this just assumes category ids start at 1 and increase sequentially.
     'label_map': None
 }) 
+
+cityscapes_dataset_equalized = cityscapes_dataset.copy({
+    'train_images': './data/cityscapes/images_equalized/',
+    'valid_images': './data/cityscapes/images_equalized/',
+})
+
 
 
 # ----------------------- TRANSFORMS ----------------------- #
@@ -920,18 +937,36 @@ yolact_resnet101_im700_aspect_ratio_cityscapes_config = yolact_im700_config.copy
     'name': 'yolact_resnet101_im700_full_head_presever_aspect_ratio', 
 
     # Dataset stuff
-    'dataset': cityscapes_dataset,
+    'dataset': cityscapes_dataset_equalized,
     'num_classes': len(cityscapes_dataset.class_names) + 1,
 
     'disabled_layers_train': ['backbone', 'fpn'],
     'preserve_aspect_ratio': True,
 
-    'output_classes_map': CITYSCAPES_LABEL_MAP,
+    # 'output_classes_map': CITYSCAPES_LABEL_MAP,
 
     # 37500 iter ~= 100 epochs
     # Lets save at every 20 epochs
     'max_iter': 15000,
     'lr_steps': (.35 * 37500, .75 * 37500, .88 * 37500, .93 * 37500),
+})
+
+yolact_resnet101_im700_cityscapes_config_no_sq_anchors = yolact_im700_config.copy({
+    'name': 'yolact_resnet101_im700_cityscapes_full_head_tuned', 
+
+    # Dataset stuff
+    'dataset': cityscapes_dataset,
+    'num_classes': len(cityscapes_dataset.class_names) + 1,
+
+    # 37500 iter ~= 100 epochs
+    # Lets save at every 20 epochs
+    'max_iter': 37500,
+    'lr_steps': (.35 * 37500, .75 * 37500, .88 * 37500, .93 * 37500),
+
+    'backbone': yolact_resnet50_config.backbone.copy({
+        'pred_scales': [[32], [64], [128], [256], [512]],
+        'use_square_anchors': False,
+    })
 })
 
 # ----------------------- YOLACT++ CONFIGS ----------------------- #
