@@ -763,6 +763,33 @@ yolact_cityscapes_config_preserve_aspect_ratio = yolact_cityscapes_config.copy({
     'preserve_aspect_ratio': True,
 })
 
+yolact_cityscapes_config_half_anchor_box_scales = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_half_anchor_scales',
+    # Backbone Settings
+    'backbone': resnet101_backbone.copy({
+        'selected_layers': list(range(1, 4)),
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': True, # This is for backward compatability with a bug
+
+        'pred_aspect_ratios': [ [[1, 1/2, 2]] ]*5,
+        'pred_scales': [[12], [24], [48], [96], [192]],
+     }),
+})
+
+yolact_cityscapes_config_no_square_anchors = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_no_square_anchors',
+    # Backbone Settings
+    'backbone': resnet101_backbone.copy({
+        'selected_layers': list(range(1,4)),
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': False,
+
+        'pred_aspect_ratios': [ [[1, 1/2, 2]] ]*5,
+        'pred_scales': [[12], [24], [48], [96], [192]],
+    }),
+})
 
 yolact_cityscapes_config_no_backbone_fpn = yolact_cityscapes_config.copy({
     # USE batch size of 6!
