@@ -7,8 +7,9 @@ from utils import timer
 from utils.functions import SavePath
 from layers.output_utils import postprocess, undo_image_transformation
 import pycocotools
+from pathlib import Path
 
-from data import cfg, set_cfg, set_dataset
+from data import cfg, set_cfg, set_dataset, set_use_new_mappings
 
 import numpy as np
 import torch
@@ -113,6 +114,10 @@ def parse_args(argv=None):
                         help='When displaying / saving video, draw the FPS on the frame')
     parser.add_argument('--emulate_playback', default=False, dest='emulate_playback', action='store_true',
                         help='When saving a video, emulate the framerate that you\'d get running in real-time mode.')
+    parser.add_argument('--batch_weights', default=None, dest='batch_weights',
+                        help='Root name of weights to perform a batch evaluation')
+    parser.add_argument('--use_old_mappings', default=True, type=str2bool,
+                        help='Set to true for quantitative evaluation(MAP), Set to False when doing qualitative evaluation (Printing bounding masks to images)')
 
     parser.set_defaults(no_bar=False, display=False, resume=False, output_coco_json=False, output_web_json=False, shuffle=False,
                         benchmark=False, no_sort=False, no_hash=False, mask_proto_debug=False, crop=True, detect=False, display_fps=False,
@@ -120,7 +125,7 @@ def parse_args(argv=None):
 
     global args
     args = parser.parse_args(argv)
-
+        
     if args.output_web_json:
         args.output_coco_json = True
     
@@ -1051,7 +1056,6 @@ if __name__ == '__main__':
 
     if args.config is not None:
         set_cfg(args.config)
-
     if args.trained_model == 'interrupt':
         args.trained_model = SavePath.get_interrupt('weights/')
     elif args.trained_model == 'latest':
@@ -1070,6 +1074,9 @@ if __name__ == '__main__':
     if args.dataset is not None:
         set_dataset(args.dataset)
 
+    if not args.use_old_mappings:
+        set_use_new_mappings()
+    print('apple')
     with torch.no_grad():
         if not os.path.exists('results'):
             os.makedirs('results')
@@ -1093,15 +1100,27 @@ if __name__ == '__main__':
         else:
             dataset = None        
 
-        print('Loading model...', end='')
-        net = Yolact()
-        net.load_weights(args.trained_model)
-        net.eval()
-        print(' Done.')
+        # Evaluate a set of weights for comparison
+        if args.batch_weights:
+            trained_models = []
+            batch_weights_root = Path.cwd() / args.batch_weights
+            for file in batch_weights_root.parents[0].glob('*.pth'):
+                if batch_weights_root.name in file.name:
+                    trained_models.append(file)
+        else:
+            trained_models = [args.trained_model]
 
-        if args.cuda:
-            net = net.cuda()
+        for trained_model in trained_models:
+            print('Evaluation of: ', trained_model)
+            print('Loading model...', end='')
+            net = Yolact()
+            net.load_weights(trained_model)
+            net.eval()
+            print(' Done.')
 
-        evaluate(net, dataset)
+            if args.cuda:
+                net = net.cuda()
+
+            evaluate(net, dataset)
 
 
