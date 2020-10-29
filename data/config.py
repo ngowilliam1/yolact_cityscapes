@@ -784,6 +784,11 @@ yolact_cityscapes_config = yolact_base_config.copy({
     'lr_steps': (.35 * 22500, .75 * 22500, .88 * 22500, .93 * 22500),
 })
 
+yolact_cityscapes_config_retrain_resnet101 = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_train_from_resnet101', 
+    # Used resnet101_reducedfc.pth as initial weights
+})
+
 yolact_cityscapes_config_preserve_aspect_ratio = yolact_cityscapes_config.copy({
     'name': 'yolact_cityscapes_config_fully_fine_tuned_preserve_aspect_ratio',
     'preserve_aspect_ratio': True,
