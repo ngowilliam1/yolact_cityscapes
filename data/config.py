@@ -1040,22 +1040,57 @@ yolact_plus_resnet50_config = yolact_plus_base_config.copy({
 })
 
 # TODO: ensure correctness of parameters past num_classes
-yolact_plus_resnet50_cityscapes_config = yolact_plus_resnet50_config.copy({
-    'name': 'yolact_plus_resnet50_cityscapes', 
+yolact_plus_cityscapes_config_resnet50 = yolact_plus_resnet50_config.copy({
+    'name': 'yolact_plus_cityscapes_resnet50', 
     
     # Dataset stuff
     'dataset': cityscapes_dataset,
     'num_classes': len(cityscapes_dataset.class_names) + 1,
 
-    'max_iter': 40000,
-    'lr_steps': (60000, 100000),
+    # Assuming epoch size of 8
+    # 1 epoch = 375 iterations
+    # == 60 total epochs
+    'max_iter': 22500,
+    'lr_steps': (.35 * 22500, .75 * 22500, .88 * 22500, .93 * 22500),
 
 })
-# TODO: ensure correctness of parameters past num_classes
-yolact_plus_resnet50_cityscapes_config_last_layer = yolact_plus_resnet50_cityscapes_config.copy({
-    'name': 'yolact_plus_resnet50_cityscapes_last_layer', 
+
+yolact_plus_cityscapes_config_last_layer_resnet50 = yolact_plus_resnet50_cityscapes_config.copy({
+    'name': 'yolact_plus_cityscapes_last_layer_resnet50', 
     'only_last_layer': True,
 })
+
+yolact_plus_cityscapes_config_no_backbone_no_fpn_resnet50 = yolact_plus_resnet50_cityscapes_config.copy({
+    'name': 'yolact_plus_cityscapes_no_backbone_no_fpn_resnet50', 
+    'disabled_layers_train': ['backbone','fpn'],
+})
+
+
+yolact_plus_cityscapes_config_retrain_resnet50 = yolact_plus_resnet50_cityscapes_config.copy({
+    'name': 'yolact_plus_cityscapes_config_train_from_resnet50', 
+    # Used resnet50_reducedfc.pth as initial weights
+})
+
+yolact_plus_cityscapes_config_preserve_aspect_ratio_resnet50 = yolact_plus_resnet50_cityscapes_config.copy({
+    'name': 'yolact_plus_cityscapes_config_preserve_aspect_ratio_resnet50',
+    'preserve_aspect_ratio': True,
+})
+
+yolact_plus_cityscapes_config_half_anchor_box_scales_resnet50 = yolact_plus_resnet50_cityscapes_config.copy({
+    'name': 'yolact_plus_cityscapes_config_half_anchor_scales_resnet50',
+    # Backbone Settings
+    'backbone': resnet50_dcnv2_backbone.copy({
+        'selected_layers': list(range(1, 4)),
+        
+        'pred_aspect_ratios': [ [[1, 1/2, 2]] ]*5,
+        'pred_scales': [[i * 2 ** (j / 3.0) for j in range(3)] for i in [12 ,24, 48, 96, 192]],
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': False,
+    }),
+})
+
+
 
 
 # Default config
