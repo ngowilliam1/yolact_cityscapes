@@ -1090,6 +1090,13 @@ yolact_plus_cityscapes_config_half_anchor_box_scales_resnet50 = yolact_plus_resn
     }),
 })
 
+yolact_plus_cityscapes_config_focal_loss = yolact_plus_resnet50_cityscapes_config.copy({
+    'name': 'yolact_plus_cityscapes_config_focal_loss_resnet50', 
+    'use_focal_loss': True,
+    'focal_loss_alpha': 0.25,
+    'focal_loss_gamma': 2,
+})
+
 
 
 
