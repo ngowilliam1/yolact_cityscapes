@@ -789,6 +789,7 @@ yolact_cityscapes_config_retrain_resnet101 = yolact_cityscapes_config.copy({
     # Used resnet101_reducedfc.pth as initial weights
 })
 
+
 yolact_cityscapes_config_preserve_aspect_ratio = yolact_cityscapes_config.copy({
     'name': 'yolact_cityscapes_config_fully_fine_tuned_preserve_aspect_ratio',
     'preserve_aspect_ratio': True,
@@ -901,6 +902,19 @@ yolact_resnet50_config = yolact_base_config.copy({
         'preapply_sqrt': False,
         'use_square_anchors': True, # This is for backward compatability with a bug
     }),
+})
+
+yolact_cityscapes_config_retrain_resnet50 = yolact_resnet50_config.copy({
+    'name': 'yolact_cityscapes_config_train_from_resnet50', 
+    # Used resnet50-19c8e357.pth as initial weights
+
+    # Dataset stuff
+    'dataset': cityscapes_dataset,
+    'num_classes': len(cityscapes_dataset.class_names) + 1,
+
+    'max_iter': 22500,
+    'lr_steps': (.35 * 22500, .75 * 22500, .88 * 22500, .93 * 22500),
+    
 })
 
 
@@ -1055,28 +1069,28 @@ yolact_plus_cityscapes_config_resnet50 = yolact_plus_resnet50_config.copy({
 
 })
 
-yolact_plus_cityscapes_config_last_layer_resnet50 = yolact_plus_resnet50_cityscapes_config.copy({
+yolact_plus_cityscapes_config_last_layer_resnet50 = yolact_plus_cityscapes_config_resnet50.copy({
     'name': 'yolact_plus_cityscapes_last_layer_resnet50', 
     'only_last_layer': True,
 })
 
-yolact_plus_cityscapes_config_no_backbone_no_fpn_resnet50 = yolact_plus_resnet50_cityscapes_config.copy({
+yolact_plus_cityscapes_config_no_backbone_no_fpn_resnet50 = yolact_plus_cityscapes_config_resnet50.copy({
     'name': 'yolact_plus_cityscapes_no_backbone_no_fpn_resnet50', 
     'disabled_layers_train': ['backbone','fpn'],
 })
 
 
-yolact_plus_cityscapes_config_retrain_resnet50 = yolact_plus_resnet50_cityscapes_config.copy({
+yolact_plus_cityscapes_config_retrain_resnet50 = yolact_plus_cityscapes_config_resnet50.copy({
     'name': 'yolact_plus_cityscapes_config_train_from_resnet50', 
     # Used resnet50_reducedfc.pth as initial weights
 })
 
-yolact_plus_cityscapes_config_preserve_aspect_ratio_resnet50 = yolact_plus_resnet50_cityscapes_config.copy({
+yolact_plus_cityscapes_config_preserve_aspect_ratio_resnet50 = yolact_plus_cityscapes_config_resnet50.copy({
     'name': 'yolact_plus_cityscapes_config_preserve_aspect_ratio_resnet50',
     'preserve_aspect_ratio': True,
 })
 
-yolact_plus_cityscapes_config_half_anchor_box_scales_resnet50 = yolact_plus_resnet50_cityscapes_config.copy({
+yolact_plus_cityscapes_config_half_anchor_box_scales_resnet50 = yolact_plus_cityscapes_config_resnet50.copy({
     'name': 'yolact_plus_cityscapes_config_half_anchor_scales_resnet50',
     # Backbone Settings
     'backbone': resnet50_dcnv2_backbone.copy({
@@ -1090,7 +1104,7 @@ yolact_plus_cityscapes_config_half_anchor_box_scales_resnet50 = yolact_plus_resn
     }),
 })
 
-yolact_plus_cityscapes_config_focal_loss = yolact_plus_resnet50_cityscapes_config.copy({
+yolact_plus_cityscapes_config_focal_loss = yolact_plus_cityscapes_config_resnet50.copy({
     'name': 'yolact_plus_cityscapes_config_focal_loss_resnet50', 
     'use_focal_loss': True,
     'focal_loss_alpha': 0.25,
