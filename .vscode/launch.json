@@ -1,0 +1,84 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Eval ResNet101 im700 w/ Coco",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/eval.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--trained_model=weights/yolact_im700_54_800000.pth",
+                "--config=yolact_resnet101_im700_cityscapes_with_coco_config",
+            ]
+        },
+        {
+            "name": "Run Eval ResNet50 im550 w/ Coco",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/eval.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--trained_model=weights/yolact_resnet50_54_800000_original.pth",
+                "--config=yolact_resnet50_cityscapes_with_coco_config",
+            ]
+        },
+        {
+            "name": "Run Eval Single image",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/eval.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--trained_model=weights/yolact_resnet50_54_800000.pth",
+                "--config=yolact_resnet50_cityscapes_config", 
+                "--score_threshold=0.15",
+                "--top_k=15",
+                "--image=data/cityscapes/images/dusseldorf_000220_000019_leftImg8bit.png:data/cityscapes/output/test_output.png"
+            ]
+        },
+        {
+            "name": "Run Eval Single image ++",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/eval.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--trained_model=weights/yolact_plus_resnet50_54_800000.pth",
+                "--config=yolact_plus_resnet50_cityscapes_config", 
+                "--score_threshold=0.15",
+                "--top_k=15",
+                "--image=data/cityscapes/images/dusseldorf_000220_000019_leftImg8bit.png:data/cityscapes/output/test_output.png"
+            ]
+        },
+        {
+            "name": "Run Eval All Images",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/eval.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--trained_model=weights/yolact_resnet50_54_800000_original.pth",
+                "--config=yolact_resnet50_cityscapes_config", 
+                "--score_threshold=0.15",
+                "--top_k=15",
+                "--images=data/cityscapes/images/:data/cityscapes/output/"
+            ]
+        },
+        {
+            "name": "Train ResNet101 im700 Only Head",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/train.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--config=yolact_resnet101_im700_cityscapes_config", 
+                "--resume=weights/yolact_im700_54_800000.pth",
+                "--save_interval=375"
+            ]
+        }
+    ]
+}

@@ -183,6 +183,27 @@ CITYSCAPES_CLASSES = (
     'bicycle',
 )
 
+# CITYSCAPES_LABEL_MAP = {
+#     0: 0,
+#     1: 2,
+#     2: 7,
+#     3: 1,
+#     4: 4,
+#     5: 5,
+#     6: 6,
+#     7: 3,
+# }
+
+CITYSCAPES_LABEL_MAP = {
+    0: 0,
+    1: 2,
+    2: 7,
+    3: 1,
+    4: 4,
+    5: 3,
+    6: 6,
+    7: 5,
+}
 
 cityscapes_dataset = dataset_base.copy({
     'name': 'Cityscapes',
@@ -205,6 +226,11 @@ cityscapes_dataset = dataset_base.copy({
     # provide a map from category_id -> index in class_names + 1 (the +1 is there because it's 1-indexed).
     # If not specified, this just assumes category ids start at 1 and increase sequentially.
     'label_map': None
+}) 
+
+cityscapes_dataset_equalized = cityscapes_dataset.copy({
+    'train_images': './data/cityscapes/images_equalized/',
+    'valid_images': './data/cityscapes/images_equalized/',
 })
 
 
@@ -678,6 +704,14 @@ coco_base_config = Config({
     'rescore_mask': False,
     'rescore_bbox': False,
     'maskious_to_train': -1,
+
+    # Disable transfer learning by default
+    'transfer_learning_allowed': False,
+    'only_last_layer': False,
+
+    # Disabled training of layers
+    'disabled_layers_train': [],
+
 })
 
 
@@ -736,6 +770,92 @@ yolact_base_config = coco_base_config.copy({
     'use_semantic_segmentation_loss': True,
 })
 
+# TODO: ensure correctness of parameters past num_classes
+yolact_cityscapes_config = yolact_base_config.copy({
+    'name': 'yolact_cityscapes_config_fully_fine_tuned', 
+
+    # Dataset stuff
+    'dataset': cityscapes_dataset,
+    'num_classes': len(cityscapes_dataset.class_names) + 1,
+    # 22500 iter ~= 60 epochs
+    # 3000/8 = 375
+    # Lets save at every 10 epochs ie: save at each 375*10=3750 iter
+    'max_iter': 22500,
+    'lr_steps': (.35 * 22500, .75 * 22500, .88 * 22500, .93 * 22500),
+})
+
+yolact_cityscapes_config_retrain_resnet101 = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_train_from_resnet101', 
+    # Used resnet101_reducedfc.pth as initial weights
+})
+
+
+yolact_cityscapes_config_preserve_aspect_ratio = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_fully_fine_tuned_preserve_aspect_ratio',
+    'preserve_aspect_ratio': True,
+})
+
+yolact_cityscapes_config_half_anchor_box_scales = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_half_anchor_scales',
+    # Backbone Settings
+    'backbone': resnet101_backbone.copy({
+        'selected_layers': list(range(1, 4)),
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': True, # This is for backward compatability with a bug
+
+        'pred_aspect_ratios': [ [[1, 1/2, 2]] ]*5,
+        'pred_scales': [[12], [24], [48], [96], [192]],
+     }),
+})
+
+yolact_cityscapes_config_no_square_anchors = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_no_square_anchors',
+    # Backbone Settings
+    'backbone': resnet101_backbone.copy({
+        'selected_layers': list(range(1,4)),
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': False,
+
+        'pred_aspect_ratios': [ [[1, 1/2, 2]] ]*5,
+        'pred_scales': [[12], [24], [48], [96], [192]],
+    }),
+})
+
+yolact_cityscapes_config_no_backbone_fpn = yolact_cityscapes_config.copy({
+    # USE batch size of 6!
+    'name': 'yolact_cityscapes_full_head_tuned', 
+
+    'disabled_layers_train': ['backbone','fpn'],
+    # 50000 iter ~= 100 epochs
+    # 3000/6 = 500
+    # Lets save at every 10 epochs ie: save at each 375*10=3750 iter
+    'max_iter': 50000,
+    'lr_steps': (.35 * 50000, .75 * 50000, .88 * 50000, .93 * 50000),
+})
+
+
+# TODO: ensure correctness of parameters past num_classes
+yolact_cityscapes_config_last_layer = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_last_layer', 
+    'only_last_layer': True,
+
+    # 7500 iter ~= 20 epochs
+    # Lets save at every 5 epochs
+    'max_iter': 7500,
+    'lr_steps': (.35 * 7500, .75 * 7500, .88 * 7500, .93 * 7500),
+})
+
+yolact_cityscapes_config_no_backbone_training = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_no_backbone_training',
+    'disabled_layers_train': ['backbone'],
+})
+
+yolact_cityscapes_config_no_protonet_training = yolact_cityscapes_config.copy({
+    'name': 'yolact_cityscapes_config_no_backbone_training',
+    'disabled_layers_train': ['proto_net'],
+})
 
 yolact_im400_config = yolact_base_config.copy({
     'name': 'yolact_im400',
@@ -772,7 +892,7 @@ yolact_darknet53_config = yolact_base_config.copy({
 
 yolact_resnet50_config = yolact_base_config.copy({
     'name': 'yolact_resnet50',
-
+    
     'backbone': resnet50_backbone.copy({
         'selected_layers': list(range(1, 4)),
         
@@ -782,6 +902,19 @@ yolact_resnet50_config = yolact_base_config.copy({
         'preapply_sqrt': False,
         'use_square_anchors': True, # This is for backward compatability with a bug
     }),
+})
+
+yolact_cityscapes_config_retrain_resnet50 = yolact_resnet50_config.copy({
+    'name': 'yolact_cityscapes_config_train_from_resnet50', 
+    # Used resnet50-19c8e357.pth as initial weights
+
+    # Dataset stuff
+    'dataset': cityscapes_dataset,
+    'num_classes': len(cityscapes_dataset.class_names) + 1,
+
+    'max_iter': 22500,
+    'lr_steps': (.35 * 22500, .75 * 22500, .88 * 22500, .93 * 22500),
+    
 })
 
 
@@ -803,15 +936,79 @@ yolact_resnet50_pascal_config = yolact_resnet50_config.copy({
 
 # TODO: ensure correctness of parameters past num_classes
 yolact_resnet50_cityscapes_config = yolact_resnet50_config.copy({
-    'name': 'yolact_resnet50_cityscapes', 
-    
+    'name': 'yolact_resnet50_cityscapes_fully_fine_tuned', 
+
+    # Dataset stuff
+    'dataset': cityscapes_dataset,
+    'num_classes': len(cityscapes_dataset.class_names) + 1,
+    # 37500 iter ~= 100 epochs
+    # Lets save at every 20 epochs
+    'max_iter': 37500,
+    'lr_steps': (.35 * 37500, .75 * 37500, .88 * 37500, .93 * 37500),
+
+    'backbone': yolact_resnet50_config.backbone.copy({
+        'pred_scales': [[32], [64], [128], [256], [512]],
+        'use_square_anchors': False,
+    })
+})
+
+# TODO: ensure correctness of parameters past num_classes
+yolact_resnet50_cityscapes_config_last_layer = yolact_resnet50_cityscapes_config.copy({
+    'name': 'yolact_resnet50_cityscapes_last_layer', 
+    'only_last_layer': True,
+
+    # 7500 iter ~= 20 epochs
+    # Lets save at every 5 epochs
+    'max_iter': 7500,
+    'lr_steps': (.35 * 7500, .75 * 7500, .88 * 7500, .93 * 7500),
+})
+
+yolact_resnet101_im700_cityscapes_config = yolact_im700_config.copy({
+    'name': 'yolact_resnet101_im700_cityscapes_full_head_tuned', 
+
     # Dataset stuff
     'dataset': cityscapes_dataset,
     'num_classes': len(cityscapes_dataset.class_names) + 1,
 
-    'max_iter': 120000,
-    'lr_steps': (60000, 100000),
-    
+    'disabled_layers_train': ['backbone', 'fpn'],
+
+    # 37500 iter ~= 100 epochs
+    # Lets save at every 20 epochs
+    'max_iter': 37500,
+    'lr_steps': (.35 * 37500, .75 * 37500, .88 * 37500, .93 * 37500),
+})
+
+
+yolact_resnet101_im700_aspect_ratio_cityscapes_config = yolact_im700_config.copy({
+    'name': 'yolact_resnet101_im700_full_head_presever_aspect_ratio', 
+
+    # Dataset stuff
+    'dataset': cityscapes_dataset_equalized,
+    'num_classes': len(cityscapes_dataset.class_names) + 1,
+
+    'disabled_layers_train': ['backbone', 'fpn'],
+    'preserve_aspect_ratio': True,
+
+    # 'output_classes_map': CITYSCAPES_LABEL_MAP,
+
+    # 37500 iter ~= 100 epochs
+    # Lets save at every 20 epochs
+    'max_iter': 15000,
+    'lr_steps': (.35 * 37500, .75 * 37500, .88 * 37500, .93 * 37500),
+})
+
+yolact_resnet101_im700_cityscapes_config_no_sq_anchors = yolact_im700_config.copy({
+    'name': 'yolact_resnet101_im700_cityscapes_full_head_tuned', 
+
+    # Dataset stuff
+    'dataset': cityscapes_dataset,
+    'num_classes': len(cityscapes_dataset.class_names) + 1,
+
+    # 37500 iter ~= 100 epochs
+    # Lets save at every 20 epochs
+    'max_iter': 37500,
+    'lr_steps': (.35 * 37500, .75 * 37500, .88 * 37500, .93 * 37500),
+
     'backbone': yolact_resnet50_config.backbone.copy({
         'pred_scales': [[32], [64], [128], [256], [512]],
         'use_square_anchors': False,
@@ -856,6 +1053,66 @@ yolact_plus_resnet50_config = yolact_plus_base_config.copy({
     }),
 })
 
+# TODO: ensure correctness of parameters past num_classes
+yolact_plus_cityscapes_config_resnet50 = yolact_plus_resnet50_config.copy({
+    'name': 'yolact_plus_cityscapes_resnet50', 
+    
+    # Dataset stuff
+    'dataset': cityscapes_dataset,
+    'num_classes': len(cityscapes_dataset.class_names) + 1,
+
+    # Assuming epoch size of 8
+    # 1 epoch = 375 iterations
+    # == 60 total epochs
+    'max_iter': 22500,
+    'lr_steps': (.35 * 22500, .75 * 22500, .88 * 22500, .93 * 22500),
+
+})
+
+yolact_plus_cityscapes_config_last_layer_resnet50 = yolact_plus_cityscapes_config_resnet50.copy({
+    'name': 'yolact_plus_cityscapes_last_layer_resnet50', 
+    'only_last_layer': True,
+})
+
+yolact_plus_cityscapes_config_no_backbone_no_fpn_resnet50 = yolact_plus_cityscapes_config_resnet50.copy({
+    'name': 'yolact_plus_cityscapes_no_backbone_no_fpn_resnet50', 
+    'disabled_layers_train': ['backbone','fpn'],
+})
+
+
+yolact_plus_cityscapes_config_retrain_resnet50 = yolact_plus_cityscapes_config_resnet50.copy({
+    'name': 'yolact_plus_cityscapes_config_train_from_resnet50', 
+    # Used resnet50_reducedfc.pth as initial weights
+})
+
+yolact_plus_cityscapes_config_preserve_aspect_ratio_resnet50 = yolact_plus_cityscapes_config_resnet50.copy({
+    'name': 'yolact_plus_cityscapes_config_preserve_aspect_ratio_resnet50',
+    'preserve_aspect_ratio': True,
+})
+
+yolact_plus_cityscapes_config_half_anchor_box_scales_resnet50 = yolact_plus_cityscapes_config_resnet50.copy({
+    'name': 'yolact_plus_cityscapes_config_half_anchor_scales_resnet50',
+    # Backbone Settings
+    'backbone': resnet50_dcnv2_backbone.copy({
+        'selected_layers': list(range(1, 4)),
+        
+        'pred_aspect_ratios': [ [[1, 1/2, 2]] ]*5,
+        'pred_scales': [[i * 2 ** (j / 3.0) for j in range(3)] for i in [12 ,24, 48, 96, 192]],
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': False,
+    }),
+})
+
+yolact_plus_cityscapes_config_focal_loss = yolact_plus_cityscapes_config_resnet50.copy({
+    'name': 'yolact_plus_cityscapes_config_focal_loss_resnet50', 
+    'use_focal_loss': True,
+    'focal_loss_alpha': 0.25,
+    'focal_loss_gamma': 2,
+})
+
+
+
 
 # Default config
 cfg = yolact_base_config.copy()
@@ -875,4 +1132,10 @@ def set_dataset(dataset_name:str):
     """ Sets the dataset of the current config. """
     cfg.dataset = eval(dataset_name)
     
+    
+def set_fine_tune(transfer_learning_allowed: bool):
+    cfg.transfer_learning_allowed = transfer_learning_allowed
+
+def set_use_new_mappings():
+    cfg.dataset.label_map = CITYSCAPES_LABEL_MAP
     
