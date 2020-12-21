@@ -23,9 +23,13 @@ cd yolact_cityscapes
 conda env create -f environment.yml
 
 # activate the conda environment
-source activate yolact-env-city
+conda activate yolact-env-city
 
 ```
+
+### Download Weights
+Download required weights from [YOLACT++](https://github.com/dbolya/yolact/)
+
 
 ### To Obtain Dataset
 ```bash
